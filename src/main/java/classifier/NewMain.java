@@ -10,6 +10,8 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Standardize;
 
 /**
  *
@@ -36,7 +38,10 @@ public class NewMain {
             System.out.println("============= "+filename+" =============\n");
                         
             DataSource source = new DataSource(filepath+filename);
-            Instances data = source.getDataSet();
+            Instances dataset = source.getDataSet();
+            Standardize standard = new Standardize();
+            standard.setInputFormat(dataset);
+            Instances data = Filter.useFilter(dataset, standard);
 
             data.setClassIndex(data.numAttributes()-1);
             data.randomize(new Random(1));
