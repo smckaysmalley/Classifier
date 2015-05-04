@@ -6,6 +6,7 @@
 package classifier;
 
 import java.util.Random;
+import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -16,28 +17,48 @@ import weka.core.converters.ConverterUtils.DataSource;
  */
 public class NewMain {
 
+    private final static String filepath = "C:\\Users\\McKay\\Documents\\";
+    private static String filename;
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        // TODO code application logic here
         
-        DataSource source = new DataSource("C:\\Users\\McKay\\Documents\\iris.csv");
-        Instances data = source.getDataSet();
-        
-        data.setClassIndex(data.numAttributes()-1);
-        data.randomize(new Random(1));
-        
-        int trainIndex = (int) Math.round(data.numInstances() * .7);
-        int testIndex = data.numInstances() - trainIndex;
-        Instances trainSet = new Instances(data, 0, trainIndex);
-        Instances testSet = new Instances(data, trainIndex, testIndex);
-        
-        HardCodedClassifier hc = new HardCodedClassifier();
-        hc.buildClassifier(data);
-        Evaluation evaluation = new Evaluation(trainSet);
-        evaluation.evaluateModel(hc, testSet);
-        System.out.println(evaluation.toSummaryString("\n RESULTS \n", true));
+        for (int i = 0; i < 3; ++i)
+        {
+            if (i==0)
+                filename = "iris.csv";
+            else if (i==1)
+                filename = "car.csv";
+            else
+                filename = "cancer.csv";
+            
+            System.out.println("============= "+filename+" =============\n");
+                        
+            DataSource source = new DataSource(filepath+filename);
+            Instances data = source.getDataSet();
+
+            data.setClassIndex(data.numAttributes()-1);
+            data.randomize(new Random(1));
+
+            int trainIndex = (int) Math.round(data.numInstances() * .8);
+            int testIndex = data.numInstances() - trainIndex;
+            Instances trainSet = new Instances(data, 0, trainIndex);
+            Instances testSet = new Instances(data, trainIndex, testIndex);
+
+            for (int k = 1; k < 6; ++k)
+            {
+                System.out.println("\n\n\t k = " +k);
+                Classifier hc = new KNNClassifier(k);
+                hc.buildClassifier(data);
+                Evaluation evaluation = new Evaluation(trainSet);
+                evaluation.evaluateModel(hc, testSet);
+                System.out.println(evaluation.toSummaryString("\n RESULTS \n", true));
+            }
+            
+            System.out.println("\n\n");
+            
+        }
         
     }
     
