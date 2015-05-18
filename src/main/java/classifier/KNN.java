@@ -7,6 +7,7 @@ package classifier;
 
 import static java.lang.Math.*;
 import java.util.*;
+import java.util.Map.Entry;
 import weka.classifiers.Classifier;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -15,18 +16,18 @@ import weka.core.Instances;
  *
  * @author McKay
  */
-public class KNNClassifier extends Classifier{
+public class KNN extends Classifier{
 
     
     private Integer k;
     private Instances data;
     private TreeMap<Double,Integer> map;
 
-    public KNNClassifier() {
+    public KNN() {
         this.k = 5;
     }
     
-    public KNNClassifier(int numK) {
+    public KNN(int numK) {
         this.k = numK;
     }
     
@@ -109,6 +110,41 @@ public class KNNClassifier extends Classifier{
         
         for(int i = 0; i < data.numInstances(); i++)
             map.put(findDistance(data.instance(i), instance), (int)(data.instance(i).classValue()));
+    }
+    
+        public static double getClassification(Instances instances) {
+        ArrayList<Instance> instanceList = new ArrayList<>(instances.numInstances());
+        for (int i = 0; i < instances.numInstances(); i++) {
+            instanceList.add(instances.instance(i));
+        }
+
+        return getClassification(instanceList);
+    }
+
+    public static double getClassification(List<Instance> instances) {
+        int index = instances.get(0).classIndex();
+        HashMap<Double, Integer> counts = new HashMap<>();
+        for (Instance instance : instances) {
+            double val = instance.value(index);
+            if (!counts.containsKey(val)) {
+                counts.put(val, 1);
+            } else {
+                counts.put(val, counts.get(val) + 1);
+            }
+        }
+
+        // Use a 'random' pick of whichever one has the largest value,
+        // no tie breaking algorithms is implemented.
+        int maxCount = 0;
+        double maxRValue = 0;
+        for (Entry<Double, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxRValue = entry.getKey();
+            }
+        }
+
+        return maxRValue;
     }
     
 }
